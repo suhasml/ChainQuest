@@ -1,0 +1,29 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import "@zetachain/contracts/ZRC20.sol";
+
+contract OmnichainGameAssets is ZRC20 {
+
+    // Structure of in-game asset
+    struct Asset {
+        string name;
+        string assetType;
+        uint256 assetId;
+    }
+
+    mapping(uint256 => Asset) public assets;
+    uint256 public nextAssetId = 1;
+
+    // Create a new asset (character or item)
+    function createAsset(string memory _name, string memory _assetType) public {
+        assets[nextAssetId] = Asset(_name, _assetType, nextAssetId);
+        nextAssetId++;
+    }
+
+    // Cross-chain asset transfer (using ZetaChain protocol)
+    function transferAssetToChain(uint256 _assetId, address _to, string memory _destinationChain) public {
+        require(assets[_assetId].assetId != 0, "Asset does not exist");
+        zetaTransfer(_to, assets[_assetId].name, assets[_assetId].assetType, _destinationChain);
+    }
+}
